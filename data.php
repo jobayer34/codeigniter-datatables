@@ -73,6 +73,29 @@ class Data extends CI_Controller
             }
         }
         
+        
+        //Column wise filtering using yadcf
+        $ja = 0;        
+        foreach($aColumns as $columns){
+            $col_name = "sSearch_".$ja;            
+            $$col_name = $this->input->get_post($col_name, true);
+            
+            if(isset($$col_name) && !empty($$col_name))
+            {   
+                
+                    $bSearchable = $this->input->get_post('bSearchable_'.$ja, true);
+
+                    // Individual column filtering
+                    if(isset($bSearchable) && $bSearchable == 'true')
+                    {
+                        $this->db->or_like($aColumns[$ja], $this->db->escape_like_str($$col_name));
+                    }
+                
+            }
+            
+            $ja++;            
+        }
+        
         // Select Data
         $this->db->select('SQL_CALC_FOUND_ROWS '.str_replace(' , ', ' ', implode(', ', $aColumns)), false);
         $rResult = $this->db->get($sTable);
